@@ -22,8 +22,10 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:21.0.3'
+    compile 'com.android.support:design:22.2.1'
     compile 'com.squareup.okhttp:okhttp:2.5.0'
     compile 'com.squareup.retrofit:retrofit:2.0.0-beta2'
     compile 'com.jakewharton:butterknife:7.0.1'
     compile 'com.wrapp.floatlabelededittext:library:0.0.6'
+
 }

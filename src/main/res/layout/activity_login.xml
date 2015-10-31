@@ -46,23 +46,31 @@
 
         <LinearLayout
             android:orientation="vertical"
+            android:descendantFocusability="beforeDescendants"
+            android:focusableInTouchMode="true"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_weight="1"
             android:id="@+id/loginfields">
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content">
 
-
-            <EditText
+                <EditText
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textEmailAddress"
+                    android:ems="10"
+                    android:id="@+id/loginEmail"
+                    android:hint="@string/enterEmailLogin"
+                    android:textColor="@android:color/white"
+                    android:textColorHint="#ffffffff"
+                    android:layout_marginBottom="10dp" />
+            </android.support.design.widget.TextInputLayout>
+            <android.support.design.widget.TextInputLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textEmailAddress"
-                android:ems="10"
-                android:id="@+id/loginEmail"
-                android:hint="@string/enterEmailLogin"
-                android:textColor="@android:color/white"
-                android:textColorHint="#ffffffff"
-                android:layout_marginBottom="10dp" />
-
+                android:layout_marginBottom="15dp">
             <EditText
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -74,6 +82,7 @@
                 android:textColor="@android:color/white"
                 android:textColorHint="#ffffffff"
                 android:layout_marginBottom="20dp" />
+            </android.support.design.widget.TextInputLayout>
             <Button
                 android:id="@+id/loginButton"
                 android:layout_width="match_parent"

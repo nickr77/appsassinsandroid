@@ -7,8 +7,91 @@
     tools:context="teamrocket.appsassins.Signup"
     android:background="@android:color/black">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Appsassins"
+        android:id="@+id/signupTitle"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:textColor="@android:color/white"
+        android:textSize="30dp"
+        android:layout_marginBottom="15dp" />
+
     <LinearLayout
         android:orientation="vertical"
+        android:descendantFocusability="beforeDescendants"
+        android:focusableInTouchMode="true"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"></LinearLayout>
+        android:layout_height="fill_parent"
+        android:layout_below="@+id/signupTitle"
+        android:gravity="center_horizontal">
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+            <EditText
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName"
+                android:hint="@string/enterFullName"
+                android:textColor="@android:color/white"
+                android:textColorHint="#ffffffff"
+                android:ems="10"
+                android:id="@+id/enterFullName"
+                android:layout_marginBottom="15dp" />
+        </android.support.design.widget.TextInputLayout>
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+            <EditText
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textEmailAddress"
+                android:hint="@string/enterEmailLogin"
+                android:textColor="@android:color/white"
+                android:textColorHint="#ffffffff"
+                android:ems="10"
+                android:id="@+id/enterEmailSignup"
+                android:layout_marginBottom="15dp" />
+        </android.support.design.widget.TextInputLayout>
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+            <EditText
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:hint="@string/enterPasswordLogin"
+                android:textColor="@android:color/white"
+                android:textColorHint="#ffffffff"
+                android:ems="10"
+                android:id="@+id/enterPasswordSignup"
+                android:layout_marginBottom="15dp" />
+        </android.support.design.widget.TextInputLayout>
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="30dp">
+            <EditText
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:hint="@string/signupConfirmPassword"
+                android:textColor="@android:color/white"
+                android:textColorHint="#ffffffff"
+                android:ems="10"
+                android:id="@+id/confirmPasswordSignup"
+                android:layout_marginBottom="30dp"
+                android:imeOptions="actionDone" />
+        </android.support.design.widget.TextInputLayout>
+        <Button
+            android:id="@+id/signUpButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/title_activity_signup"
+            android:textColor="#ffffffff"
+            android:background="#9E332D"
+            android:textSize="20sp" />
+    </LinearLayout>
 </RelativeLayout>

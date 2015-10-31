@@ -8,4 +8,11 @@
     <string name="enterPasswordLogin">Password</string>
     <string name="loginButton">Sign In</string>
     <string name="title_activity_signup">Sign Up</string>
+    <string name="enterFullName">Full Name</string>
+    <string name="signupConfirmPassword">Confirm Password</string>
+    <string name="errorEnterFirstandLastName">Enter a first and a last name</string>
+    <string name="enterValidEmail">Enter a valid email</string>
+    <string name="passwordAtLeast8">Password must be at least 8 alphanumeric characters with at least 1 number</string>
+    <string name="passDontMatch">Passwords must match!</string>
+
 </resources>
