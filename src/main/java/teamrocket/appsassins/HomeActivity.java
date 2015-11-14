@@ -13,12 +13,15 @@ import android.view.MenuItem;
 public class HomeActivity extends ActionBarActivity {
     private SharedPreferences prefs;
     private static final String TAG = "HomeActivity";
+    private User user;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         prefs = getSharedPreferences("authUser", Context.MODE_PRIVATE);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+        user = new User();
         if (checkIfLoggedIn() == false){
             Intent loginpage = new Intent(getApplicationContext(), LoginActivity.class);
             startActivity(loginpage);
@@ -51,9 +54,15 @@ public class HomeActivity extends ActionBarActivity {
     private boolean checkIfLoggedIn() {
         String infoTest = "";
         infoTest = prefs.getString("username", "NO USER LOGGED IN");
+        Log.d(TAG, infoTest);
         if (infoTest == "NO USER LOGGED IN") {
             return false;
         }
+        user.setUsername(prefs.getString("username", "failure"));
+        user.setPassword(prefs.getString("password", "failure"));
+        user.setFirstName(prefs.getString("fName", "failure"));
+        user.setLastName(prefs.getString("lName", "failure"));
+
         return true;
     }
 }
