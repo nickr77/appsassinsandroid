@@ -1,5 +1,6 @@
 package teamrocket.appsassins;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -45,6 +46,7 @@ public class LoginActivity extends ActionBarActivity {
     private String jsonData;
     private SharedPreferences prefs;
     private boolean isValid;
+    private View v;
 
 
     @Override
@@ -68,6 +70,7 @@ public class LoginActivity extends ActionBarActivity {
 
     @OnClick(R.id.loginButton)
     public void attemptLogin(View view) {
+        v = view;
         InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(passwordEntry.getWindowToken(), 0);
         String email = emailEntry.getText().toString();
@@ -122,6 +125,12 @@ public class LoginActivity extends ActionBarActivity {
 
 
         if (isNetWorkAvailable()) {
+            final ProgressDialog dialog = new ProgressDialog(LoginActivity.this);
+            dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            dialog.setMessage("Logging In");
+            dialog.setIndeterminate(true);
+            dialog.setCanceledOnTouchOutside(false);
+
 
             OkHttpClient client = new OkHttpClient();
 
@@ -133,6 +142,7 @@ public class LoginActivity extends ActionBarActivity {
 
 
             Call call = client.newCall(request);
+            dialog.show();
             call.enqueue(new Callback() {
                 @Override
                 public void onFailure(Request request, IOException e) {
@@ -140,6 +150,8 @@ public class LoginActivity extends ActionBarActivity {
                         @Override
                         public void run() {
                             //Snackbar.make(this, getString(R.string.passwordAtLeast8) ,Snackbar.LENGTH_SHORT).show();
+                            dialog.hide();
+                            Snackbar.make(v, "Could not contact the server", Snackbar.LENGTH_SHORT).show();
                         }
                     });
                 }
@@ -154,6 +166,7 @@ public class LoginActivity extends ActionBarActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
+                                dialog.hide();
                                 if (isValid == true) {
                                     Log.d(TAG, "Starting Home Activity from LoginActivity");
                                     Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
@@ -162,7 +175,7 @@ public class LoginActivity extends ActionBarActivity {
                                 }
                                 else
                                 {
-                                    //show error message
+                                    Snackbar.make(v, "Account Details Incorrect", Snackbar.LENGTH_SHORT).show();
                                 }
                             }
                         });

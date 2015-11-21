@@ -1,5 +1,6 @@
 package teamrocket.appsassins;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -50,6 +51,7 @@ public class Signup extends ActionBarActivity {
     private String[] name;
     private String email;
     private String password;
+    private View v;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +73,7 @@ public class Signup extends ActionBarActivity {
     }
     @OnClick(R.id.signUpButton)
     public void attemptSignUp(View view) {
+        v = view;
         InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(confirmPasswordEntry.getWindowToken(), 0);
         String tempName = nameEntry.getText().toString();
@@ -125,6 +128,14 @@ public class Signup extends ActionBarActivity {
     }
 
     private void createAccount() {
+        final ProgressDialog dialog = new ProgressDialog(Signup.this);
+        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        dialog.setMessage("Logging In");
+        dialog.setIndeterminate(true);
+        dialog.setCanceledOnTouchOutside(false);
+
+
+
         if (isNetWorkAvailable()){
             OkHttpClient client = new OkHttpClient();
 
@@ -139,13 +150,15 @@ public class Signup extends ActionBarActivity {
 
 
             Call call = client.newCall(request);
+            dialog.show();
             call.enqueue(new Callback() {
                 @Override
                 public void onFailure(Request request, IOException e) {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            //display error message
+                            dialog.hide();
+                            Snackbar.make(v, "Could not connect to the server", Snackbar.LENGTH_SHORT).show();
                         }
                     });
                 }
@@ -158,10 +171,12 @@ public class Signup extends ActionBarActivity {
                         isWorking = verifyAccount();
                     } catch (JSONException e) {
                         //This ain't the ritz carlton, I'm not gonna handle this
+
                     }
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+                            dialog.hide();
                             if (isWorking == true)
                             {
                                 Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
@@ -169,7 +184,8 @@ public class Signup extends ActionBarActivity {
                                 finish();
                             }
                             else {
-                                //display error message
+
+                                Snackbar.make(v, "Could not connect to the server", Snackbar.LENGTH_SHORT).show();
                             }
                         }
                     });
@@ -185,6 +201,7 @@ public class Signup extends ActionBarActivity {
         else {
 
         }
+
     }
     private boolean isNetWorkAvailable() {
         ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
