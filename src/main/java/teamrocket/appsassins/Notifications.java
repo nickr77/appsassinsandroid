@@ -123,7 +123,7 @@ public class Notifications extends AppCompatActivity {
                     } catch (JSONException e) {
                         Log.e("parse", e.toString());
                     }
-                    
+
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
