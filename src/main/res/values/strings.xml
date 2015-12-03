@@ -16,6 +16,16 @@
     <string name="passDontMatch">Passwords must match!</string>
     <string name="title_activity_notifications">Notifications</string>
     <string name="temp">Temp Button</string>
+    <string name="notif_cancel">Cancel</string>
+    <string name="notif_confirm">Confirm</string>
+    <string name="notif_deny">Deny</string>
+    <string name="dialog_notifications">Send Response</string>
+
+
+
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 
 </resources>

@@ -146,7 +146,7 @@ public class Signup extends ActionBarActivity {
                     .add("email", email).add("password", password)
                     .build();
 
-            Request request = new Request.Builder().url("http://private-f80ce-appsassins.apiary-mock.com/register").post(formBody).build();
+            Request request = new Request.Builder().url("http://private-f80ce-appsassins.apiary-mock.com/registerUser").post(formBody).build();
 
 
             Call call = client.newCall(request);
