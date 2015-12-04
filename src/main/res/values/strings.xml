@@ -19,8 +19,8 @@
     <string name="notif_cancel">Cancel</string>
     <string name="notif_confirm">Confirm</string>
     <string name="notif_deny">Deny</string>
-    <string name="dialog_notifications">Send Response</string>
-
+    <string name="dialog_notifications">Send invitation response</string>
+    <string name="dialog_confirm_kill">Is this a valid kill?</string>
 
 
 

@@ -89,10 +89,10 @@ public class Notifications extends AppCompatActivity {
             OkHttpClient client = new OkHttpClient();
 
             RequestBody formBody = new FormEncodingBuilder()
-                    .add("email", "spanky@smu.edu")
+                    .add("email", "jrthomas@smu.edu")
                     .build();
             String url = "http://54.149.40.71/appsassins/api/index.php/getNotifications";
-            url = "http://private-f462a-appsassins.apiary-mock.com/getNotifications";
+            //url = "http://private-f462a-appsassins.apiary-mock.com/getNotifications";
             Request request = new Request.Builder().url(url).post(formBody).build();
 
 
@@ -135,7 +135,6 @@ public class Notifications extends AppCompatActivity {
                                     Log.i("clicked", position.toString());
                                     int type = notifList.get(i).getType();
                                     if (type == 0 || type == 3) {
-                                        //Snackbar.make(notifView, "Accept or Decline?", Snackbar.LENGTH_LONG).show();
                                         NotificationAlert alertDialog = new NotificationAlert();
                                         alertDialog.setNotifID(notifList.get(i).getNotifID());
                                         alertDialog.setType(type);
@@ -143,10 +142,7 @@ public class Notifications extends AppCompatActivity {
                                     }
                                 }
                             });
-                            //dialog.hide()
-                            //Log.v(TAG, jsonData);
-                            //Snackbar.make(findViewById(R.id.notifs), "Running", Snackbar.LENGTH_SHORT).show();
-
+                            
                         }
                     });
 
