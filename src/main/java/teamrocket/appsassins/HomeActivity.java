@@ -11,6 +11,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 
 import com.squareup.okhttp.Call;
 import com.squareup.okhttp.Callback;
@@ -24,6 +26,10 @@ import org.json.JSONException;
 
 import java.io.IOException;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
 
 public class HomeActivity extends AppCompatActivity {
     private SharedPreferences prefs;
@@ -31,18 +37,21 @@ public class HomeActivity extends AppCompatActivity {
     private User user;
     private String jsonData;
 
+    @Bind(R.id.tempbutton) Button tempbutton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         prefs = getSharedPreferences("authUser", Context.MODE_PRIVATE);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+        ButterKnife.bind(this);
         user = new User();
         if (checkIfLoggedIn() == false){
             Intent loginpage = new Intent(getApplicationContext(), LoginActivity.class);
             startActivity(loginpage);
             finish();
         }
+
         //getGameInformation();
     }
 
@@ -150,5 +159,12 @@ public class HomeActivity extends AppCompatActivity {
     }
     private void parseResponse() throws JSONException{
 
+    }
+
+    @OnClick(R.id.tempbutton)
+    public void startNotif(View view) {
+        Log.d(TAG, "here");
+        Intent notifPage = new Intent(getApplicationContext(), Notifications.class);
+        startActivity(notifPage);
     }
 }

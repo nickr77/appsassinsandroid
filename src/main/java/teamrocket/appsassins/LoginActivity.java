@@ -138,7 +138,7 @@ public class LoginActivity extends ActionBarActivity {
                     .add("email", emailText).add("password", pwText)
                     .build();
 
-            Request request = new Request.Builder().url("http://private-f80ce-appsassins.apiary-mock.com/login").post(formBody).build();
+            Request request = new Request.Builder().url("http://private-f80ce-appsassins.apiary-mock.com/loginUser").post(formBody).build();
 
 
             Call call = client.newCall(request);
