@@ -124,7 +124,7 @@ public class Notifications extends AppCompatActivity {
                         @Override
                         public void run() {
                             final ListView notifView = (ListView)findViewById(R.id.notif_view);
-                            ArrayAdapter<NotificationItem> adapter = new ArrayAdapter<>(Notifications.this,
+                            final ArrayAdapter<NotificationItem> adapter = new ArrayAdapter<>(Notifications.this,
                                     android.R.layout.simple_list_item_2, android.R.id.text1, notifList);
                             notifView.setAdapter(adapter);
 
@@ -142,7 +142,28 @@ public class Notifications extends AppCompatActivity {
                                     }
                                 }
                             });
-                            
+
+                            // Create a ListView-specific touch listener.
+                            SwipeDismissListViewTouchListener touchListener =
+                                    new SwipeDismissListViewTouchListener(
+                                            notifView,
+                                            new SwipeDismissListViewTouchListener.DismissCallbacks() {
+                                                @Override
+                                                public boolean canDismiss(int position) {
+                                                    return true;
+                                                }
+
+                                                @Override
+                                                public void onDismiss(ListView listView, int[] reverseSortedPositions) {
+                                                    for (int position : reverseSortedPositions) {
+                                                        adapter.remove(adapter.getItem(position));
+                                                    }
+                                                    adapter.notifyDataSetChanged();
+                                                }
+                                            });
+                            notifView.setOnTouchListener(touchListener);
+                            notifView.setOnScrollListener(touchListener.makeScrollListener());
+
                         }
                     });
 
