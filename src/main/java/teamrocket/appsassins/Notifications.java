@@ -10,6 +10,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -131,14 +132,15 @@ public class Notifications extends AppCompatActivity {
                             notifView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                                 @Override
                                 public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                                    Integer position = i;
-                                    Log.i("clicked", position.toString());
+                                    //Integer position = i;
+                                    //Log.i("clicked", position.toString());
                                     int type = notifList.get(i).getType();
                                     if (type == 0 || type == 3) {
                                         NotificationAlert alertDialog = new NotificationAlert();
                                         alertDialog.setNotifID(notifList.get(i).getNotifID());
                                         alertDialog.setType(type);
-                                        alertDialog.show(getFragmentManager(), "missiles");
+                                        alertDialog.show(getFragmentManager(), "Notifications Go!");
+
                                     }
                                 }
                             });
@@ -156,7 +158,11 @@ public class Notifications extends AppCompatActivity {
                                                 @Override
                                                 public void onDismiss(ListView listView, int[] reverseSortedPositions) {
                                                     for (int position : reverseSortedPositions) {
+                                                        notifList.get(position).dismiss();
+                                                        //notifList.remove(position);
                                                         adapter.remove(adapter.getItem(position));
+                                                        Integer test = position;
+                                                        Log.i("swipe", test.toString());
                                                     }
                                                     adapter.notifyDataSetChanged();
                                                 }
