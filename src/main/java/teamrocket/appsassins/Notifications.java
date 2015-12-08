@@ -53,7 +53,7 @@ public class Notifications extends AppCompatActivity {
         getNotifications();
 
     }
-    
+
 
     private boolean isNetWorkAvailable() {
         ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);

@@ -22,7 +22,9 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 
@@ -35,7 +37,8 @@ public class HomeActivity extends AppCompatActivity {
     private SharedPreferences prefs;
     private static final String TAG = "HomeActivity";
     private User user;
-    private String jsonData;
+    private int status;
+    private CurrentGame currentGame;
 
 
     @Override
@@ -45,13 +48,14 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
         ButterKnife.bind(this);
         user = new User();
+        currentGame = new CurrentGame();
         if (checkIfLoggedIn() == false){
             Intent loginpage = new Intent(getApplicationContext(), LoginActivity.class);
             startActivity(loginpage);
             finish();
         }
 
-        //getGameInformation();
+        getGameInformation();
     }
 
     private void getGameInformation() {
@@ -63,9 +67,9 @@ public class HomeActivity extends AppCompatActivity {
                     .add("email", user.getUsername())
                     .build();
 
-            Request request = new Request.Builder().url("http://private-f80ce-appsassins.apiary-mock.com/currentGame").post(formBody).build();
+            Request request = new Request.Builder().url("http://private-f80ce-appsassins.apiary-mock.com/getCurrentGameStatus").post(formBody).build();
 
-
+            Log.d(TAG, "ABOUT TO CALL NETWORK");
             Call call = client.newCall(request);
             call.enqueue(new Callback() {
                 @Override
@@ -82,9 +86,7 @@ public class HomeActivity extends AppCompatActivity {
                 public void onResponse(Response response) throws IOException {
                     try {
 
-                        jsonData = response.body().string();
-                        Log.v(TAG, jsonData);
-                        parseResponse();
+                        parseResponse(response.body().string());
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -164,7 +166,31 @@ public class HomeActivity extends AppCompatActivity {
         }
         return isAvailable;
     }
-    private void parseResponse() throws JSONException{
+    private void parseResponse(String json) throws JSONException{
+        Log.d(TAG, json);
+        JSONObject game = new JSONObject(json);
+        status = game.getInt("gameStatus");
+        if (status != -1){
+            int gm = game.getJSONObject("user").getInt("gameMaster");
+            if (gm == 1){
+                currentGame.isGameMaster = true;
+            }
+            else{
+                currentGame.isGameMaster = false;
+            }
+            currentGame.setGameName(game.getString("gameName"));
+            JSONArray playerJson = game.getJSONArray("players");
+            for(int i = 0; i < playerJson.length(); i++){
+                String name = playerJson.getJSONObject(i).getString("Player");
+                String email = playerJson.getJSONObject(i).getString("email");
+                int alive = playerJson.getJSONObject(i).getInt("Alive");
+                currentGame.addPlayer(name, email, alive);
+            }
+
+
+        }
+
+
 
     }
 
