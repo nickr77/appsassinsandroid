@@ -37,7 +37,6 @@ public class HomeActivity extends AppCompatActivity {
     private User user;
     private String jsonData;
 
-    @Bind(R.id.tempbutton) Button tempbutton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,14 +123,22 @@ public class HomeActivity extends AppCompatActivity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                // User chose the "Settings" item, show the app settings UI...
+                return true;
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+            case R.id.action_bar_notification:
+                Intent notifPage = new Intent(getApplicationContext(), Notifications.class);
+                notifPage.putExtra("email", user.getUsername());
+                startActivity(notifPage);
+                return true;
+
+            default:
+                // If we got here, the user's action was not recognized.
+                // Invoke the superclass to handle it.
+                return super.onOptionsItemSelected(item);
         }
-
-        return super.onOptionsItemSelected(item);
     }
     private boolean checkIfLoggedIn() {
         String infoTest = "";
@@ -161,10 +168,10 @@ public class HomeActivity extends AppCompatActivity {
 
     }
 
-    @OnClick(R.id.tempbutton)
-    public void startNotif(View view) {
-        Log.d(TAG, "here");
-        Intent notifPage = new Intent(getApplicationContext(), Notifications.class);
-        startActivity(notifPage);
-    }
+//    @OnClick(R.id.tempbutton)
+//    public void startNotif(View view) {
+//        Log.d(TAG, "here");
+//        Intent notifPage = new Intent(getApplicationContext(), Notifications.class);
+//        startActivity(notifPage);
+//    }
 }

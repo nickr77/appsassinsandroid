@@ -27,6 +27,7 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment"> </string>
     <string name="confirm_kill_image">Confirm Kill</string>
+    <string name="notifications">Notifications</string>
 
 
 </resources>
