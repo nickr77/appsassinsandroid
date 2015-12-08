@@ -10,6 +10,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -89,10 +90,10 @@ public class Notifications extends AppCompatActivity {
             OkHttpClient client = new OkHttpClient();
 
             RequestBody formBody = new FormEncodingBuilder()
-                    .add("email", "spanky@smu.edu")
+                    .add("email", "jrthomas@smu.edu")
                     .build();
             String url = "http://54.149.40.71/appsassins/api/index.php/getNotifications";
-            url = "http://private-f462a-appsassins.apiary-mock.com/getNotifications";
+            //url = "http://private-f462a-appsassins.apiary-mock.com/getNotifications";
             Request request = new Request.Builder().url(url).post(formBody).build();
 
 
@@ -124,28 +125,50 @@ public class Notifications extends AppCompatActivity {
                         @Override
                         public void run() {
                             final ListView notifView = (ListView)findViewById(R.id.notif_view);
-                            ArrayAdapter<NotificationItem> adapter = new ArrayAdapter<>(Notifications.this,
+                            final ArrayAdapter<NotificationItem> adapter = new ArrayAdapter<>(Notifications.this,
                                     android.R.layout.simple_list_item_2, android.R.id.text1, notifList);
                             notifView.setAdapter(adapter);
 
                             notifView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                                 @Override
                                 public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                                    Integer position = i;
-                                    Log.i("clicked", position.toString());
+                                    //Integer position = i;
+                                    //Log.i("clicked", position.toString());
                                     int type = notifList.get(i).getType();
                                     if (type == 0 || type == 3) {
-                                        //Snackbar.make(notifView, "Accept or Decline?", Snackbar.LENGTH_LONG).show();
                                         NotificationAlert alertDialog = new NotificationAlert();
                                         alertDialog.setNotifID(notifList.get(i).getNotifID());
                                         alertDialog.setType(type);
-                                        alertDialog.show(getFragmentManager(), "missiles");
+                                        alertDialog.show(getFragmentManager(), "Notifications Go!");
+
                                     }
                                 }
                             });
-                            //dialog.hide()
-                            //Log.v(TAG, jsonData);
-                            //Snackbar.make(findViewById(R.id.notifs), "Running", Snackbar.LENGTH_SHORT).show();
+
+                            // Create a ListView-specific touch listener.
+                            SwipeDismissListViewTouchListener touchListener =
+                                    new SwipeDismissListViewTouchListener(
+                                            notifView,
+                                            new SwipeDismissListViewTouchListener.DismissCallbacks() {
+                                                @Override
+                                                public boolean canDismiss(int position) {
+                                                    return true;
+                                                }
+
+                                                @Override
+                                                public void onDismiss(ListView listView, int[] reverseSortedPositions) {
+                                                    for (int position : reverseSortedPositions) {
+                                                        notifList.get(position).dismiss();
+                                                        //notifList.remove(position);
+                                                        adapter.remove(adapter.getItem(position));
+                                                        Integer test = position;
+                                                        Log.i("swipe", test.toString());
+                                                    }
+                                                    adapter.notifyDataSetChanged();
+                                                }
+                                            });
+                            notifView.setOnTouchListener(touchListener);
+                            notifView.setOnScrollListener(touchListener.makeScrollListener());
 
                         }
                     });
