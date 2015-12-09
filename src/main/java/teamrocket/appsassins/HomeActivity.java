@@ -67,13 +67,16 @@ public class HomeActivity extends AppCompatActivity {
             startActivity(loginpage);
             finish();
         }
+        else{
+            getGameInformation();
+        }
 
-        getGameInformation();
+
     }
 
     private void getGameInformation() {
         if (isNetWorkAvailable()) {
-            final ProgressDialog dialog = new ProgressDialog(HomeActivity.this);
+            final ProgressDialog dialog = new ProgressDialog(HomeActivity.this, R.style.RedProgressDialog);
             dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
             dialog.setMessage("Loading Game Information");
             dialog.setIndeterminate(true);
@@ -116,6 +119,7 @@ public class HomeActivity extends AppCompatActivity {
                                 progress.setMax(currentGame.getPlayerAmount());
                                 progress.setProgress(currentGame.getPlayerAmount() - currentGame.getRemainingPlayers());
                                 gameTitle.setText(currentGame.getGameName());
+
                             }
                         });
 
@@ -166,6 +170,14 @@ public class HomeActivity extends AppCompatActivity {
                 startActivity(notifPage);
                 return true;
 
+            case R.id.logoutButton:
+                prefs.edit().clear().commit();
+                Intent loginpage = new Intent(getApplicationContext(), LoginActivity.class);
+                startActivity(loginpage);
+                finish();
+
+                return true;
+
             default:
                 // If we got here, the user's action was not recognized.
                 // Invoke the superclass to handle it.
@@ -176,7 +188,7 @@ public class HomeActivity extends AppCompatActivity {
         String infoTest = "";
         infoTest = prefs.getString("username", "NO USER LOGGED IN");
         Log.d(TAG, infoTest);
-        if (infoTest == "NO USER LOGGED IN") {
+        if (infoTest.equals("NO USER LOGGED IN")) {
             return false;
         }
         user.setUsername(prefs.getString("username", "failure"));

@@ -43,11 +43,12 @@
             android:layout_height="50dp"
             android:layout_below="@id/gameTitleText"
             android:id="@+id/gameProgressBar"
-            app:rcBackgroundColor="#595959"
+            app:rcBackgroundColor="#1a1a1a"
             app:rcProgressColor="@color/appsassinsnavbarcolor"
             app:rcBackgroundPadding="5dp"
             app:rcMax="10"
             app:rcProgress="5"
+            app:rcRadius="2dp"
             android:layout_marginTop="2dp" />
 
 

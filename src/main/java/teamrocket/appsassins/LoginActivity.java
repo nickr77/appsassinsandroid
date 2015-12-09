@@ -54,6 +54,7 @@ public class LoginActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
+        prefs = getSharedPreferences("authUser", Context.MODE_PRIVATE);
         passwordEntry.setOnEditorActionListener(new EditText.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId,
@@ -124,7 +125,7 @@ public class LoginActivity extends ActionBarActivity {
 
 
         if (isNetWorkAvailable()) {
-            final ProgressDialog dialog = new ProgressDialog(LoginActivity.this);
+            final ProgressDialog dialog = new ProgressDialog(LoginActivity.this, R.style.RedProgressDialog);
             dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
             dialog.setMessage("Logging In");
             dialog.setIndeterminate(true);
