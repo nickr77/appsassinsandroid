@@ -47,6 +47,14 @@ public class CurrentGame {
     public boolean getPlayerAlive(int index){
         return players.get(index).getStatus();
     }
+    public int getRemainingPlayers(){
+        int count = 0;
+        for (int i = 0; i < players.size(); i++){
+            if (players.get(i).isAlive())
+                count++;
+        }
+        return count;
+    }
 
 
 

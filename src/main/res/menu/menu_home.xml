@@ -2,12 +2,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools" tools:context=".HomeActivity">
     <item
+        android:id="@+id/refreshGameInfo"
+        android:icon="@drawable/ic_action_action_autorenew"
+        android:title="@string/refresh"
+        app:showAsAction="ifRoom" />
+    <item
         android:id="@+id/action_bar_notification"
         android:icon="@drawable/ic_stat_social_notifications"
         android:title="@string/notifications"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_settings"
-        android:title="Settings"
+        android:title="@string/settings"
         app:showAsAction="never" />
 </menu>

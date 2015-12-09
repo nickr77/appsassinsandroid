@@ -1,10 +1,13 @@
 package teamrocket.appsassins;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -13,7 +16,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
+import com.akexorcist.roundcornerprogressbar.IconRoundCornerProgressBar;
+import com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar;
 import com.squareup.okhttp.Call;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.FormEncodingBuilder;
@@ -39,6 +46,10 @@ public class HomeActivity extends AppCompatActivity {
     private User user;
     private int status;
     private CurrentGame currentGame;
+    @Bind(R.id.homeLayout) RelativeLayout layout;
+    @Bind(R.id.gameProgressBar) RoundCornerProgressBar progress;
+    @Bind(R.id.remainingPlayers) TextView remainingPlayers;
+    @Bind(R.id.gameTitleText) TextView gameTitle;
 
 
     @Override
@@ -48,7 +59,9 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
         ButterKnife.bind(this);
         user = new User();
-        currentGame = new CurrentGame();
+
+
+
         if (checkIfLoggedIn() == false){
             Intent loginpage = new Intent(getApplicationContext(), LoginActivity.class);
             startActivity(loginpage);
@@ -60,6 +73,11 @@ public class HomeActivity extends AppCompatActivity {
 
     private void getGameInformation() {
         if (isNetWorkAvailable()) {
+            final ProgressDialog dialog = new ProgressDialog(HomeActivity.this);
+            dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            dialog.setMessage("Loading Game Information");
+            dialog.setIndeterminate(true);
+            dialog.setCanceledOnTouchOutside(false);
 
             OkHttpClient client = new OkHttpClient();
 
@@ -71,13 +89,15 @@ public class HomeActivity extends AppCompatActivity {
 
             Log.d(TAG, "ABOUT TO CALL NETWORK");
             Call call = client.newCall(request);
+            dialog.show();
             call.enqueue(new Callback() {
                 @Override
                 public void onFailure(Request request, IOException e) {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            // couldn't connect message
+                            dialog.hide();
+                            Snackbar.make(layout, "Could not fetch information", Snackbar.LENGTH_SHORT).show();
                         }
                     });
                 }
@@ -85,12 +105,17 @@ public class HomeActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(Response response) throws IOException {
                     try {
-
+                        currentGame = new CurrentGame();
                         parseResponse(response.body().string());
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-
+                                dialog.hide();
+                                remainingPlayers.setText(getString(R.string.remainingplayers) + " " + (currentGame.getPlayerAmount() - currentGame.getRemainingPlayers()) + "/"
+                                        + currentGame.getPlayerAmount());
+                                progress.setMax(currentGame.getPlayerAmount());
+                                progress.setProgress(currentGame.getPlayerAmount() - currentGame.getRemainingPlayers());
+                                gameTitle.setText(currentGame.getGameName());
                             }
                         });
 
@@ -126,6 +151,11 @@ public class HomeActivity extends AppCompatActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         switch (item.getItemId()) {
+            case R.id.refreshGameInfo:
+                getGameInformation();
+                return true;
+
+
             case R.id.action_settings:
                 // User chose the "Settings" item, show the app settings UI...
                 return true;
