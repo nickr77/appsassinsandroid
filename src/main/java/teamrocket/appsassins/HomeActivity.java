@@ -24,6 +24,7 @@ import com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar;
 import com.squareup.okhttp.Call;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.FormEncodingBuilder;
+import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
@@ -113,18 +114,17 @@ public class HomeActivity extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                dialog.hide();
                                 remainingPlayers.setText(getString(R.string.remainingplayers) + " " + (currentGame.getPlayerAmount() - currentGame.getRemainingPlayers()) + "/"
                                         + currentGame.getPlayerAmount());
                                 progress.setMax(currentGame.getPlayerAmount());
                                 progress.setProgress(currentGame.getPlayerAmount() - currentGame.getRemainingPlayers());
                                 gameTitle.setText(currentGame.getGameName());
+                                dialog.hide();
 
                             }
                         });
 
-                    }
-                    catch (IOException e) {
+                    } catch (IOException e) {
                         Log.e(TAG, "Exception caught: ", e);
                     } catch (JSONException e) {
 
@@ -228,14 +228,36 @@ public class HomeActivity extends AppCompatActivity {
                 int alive = playerJson.getJSONObject(i).getInt("Alive");
                 currentGame.addPlayer(name, email, alive);
             }
-
-
         }
 
 
 
     }
 
+
+    public String getTarget() throws IOException { // this is synchronous, must be called from within runnable
+        OkHttpClient client = new OkHttpClient();
+        RequestBody formBody = new FormEncodingBuilder()
+                .add("email", user.getUsername()).build();
+        Request request = new Request.Builder()
+                .url("//get target url in here").post(formBody).build();
+
+        Response response = client.newCall(request).execute();
+        if(!response.isSuccessful()){
+            Log.d(TAG, "No target response");
+            return "FAIL";
+        }
+        String jsonData = response.body().string();
+        try {
+            JSONObject result = new JSONObject(jsonData);
+            String tName = result.getString("email"); //key may change
+            return tName;
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return "FAIL";
+        }
+
+    }
 //    @OnClick(R.id.tempbutton)
 //    public void startNotif(View view) {
 //        Log.d(TAG, "here");
