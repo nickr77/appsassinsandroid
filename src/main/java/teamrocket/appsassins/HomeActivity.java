@@ -51,6 +51,7 @@ public class HomeActivity extends AppCompatActivity {
     @Bind(R.id.gameProgressBar) RoundCornerProgressBar progress;
     @Bind(R.id.remainingPlayers) TextView remainingPlayers;
     @Bind(R.id.gameTitleText) TextView gameTitle;
+    @Bind(R.id.targetName) TextView targetName;
 
 
     @Override
@@ -111,6 +112,7 @@ public class HomeActivity extends AppCompatActivity {
                     try {
                         currentGame = new CurrentGame();
                         parseResponse(response.body().string());
+                        getTarget();
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -119,6 +121,7 @@ public class HomeActivity extends AppCompatActivity {
                                 progress.setMax(currentGame.getPlayerAmount());
                                 progress.setProgress(currentGame.getPlayerAmount() - currentGame.getRemainingPlayers());
                                 gameTitle.setText(currentGame.getGameName());
+                                targetName.setText(currentGame.getTargetName());
                                 dialog.hide();
 
                             }
@@ -235,26 +238,28 @@ public class HomeActivity extends AppCompatActivity {
     }
 
 
-    public String getTarget() throws IOException { // this is synchronous, must be called from within runnable
+    public boolean getTarget() throws IOException { // this is synchronous, must be called from within runnable
         OkHttpClient client = new OkHttpClient();
         RequestBody formBody = new FormEncodingBuilder()
                 .add("email", user.getUsername()).build();
         Request request = new Request.Builder()
-                .url("//get target url in here").post(formBody).build();
+                .url("http://private-f80ce-appsassins.apiary-mock.com/playerTarget").post(formBody).build();
 
         Response response = client.newCall(request).execute();
         if(!response.isSuccessful()){
             Log.d(TAG, "No target response");
-            return "FAIL";
+            return false;
         }
         String jsonData = response.body().string();
         try {
             JSONObject result = new JSONObject(jsonData);
             String tName = result.getString("email"); //key may change
-            return tName;
+            currentGame.setTargetEmail(result.getString("email"));
+            currentGame.setTargetName(result.getString("target"));
+            return true;
         } catch (JSONException e) {
             e.printStackTrace();
-            return "FAIL";
+            return false;
         }
 
     }

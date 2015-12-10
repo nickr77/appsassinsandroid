@@ -11,6 +11,8 @@ public class CurrentGame {
     private List<Location> locations;
     public boolean isGameMaster;
     private String gameName;
+    private String targetEmail;
+    private String targetName;
 
     public CurrentGame(){
         isGameMaster = false;
@@ -56,7 +58,19 @@ public class CurrentGame {
         return count;
     }
 
+    public String getTargetEmail() {
+        return targetEmail;
+    }
 
+    public void setTargetEmail(String targetEmail) {
+        this.targetEmail = targetEmail;
+    }
 
+    public String getTargetName() {
+        return targetName;
+    }
 
+    public void setTargetName(String targetName) {
+        this.targetName = targetName;
+    }
 }
