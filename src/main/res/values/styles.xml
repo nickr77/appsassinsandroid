@@ -27,5 +27,10 @@
     <style name="RobotoEditTextStyle" parent="android:Widget.EditText">
         <item name="android:fontFamily">sans-serif-light</item>
     </style>
+    <style name="RedProgressDialog" parent="Theme.AppCompat.Dialog">
+        <item name="colorAccent">#FFF</item>
+        <item name="android:background">@color/appsassinsnavbarcolor</item>
+        <item name="android:textColor">#FFF</item>
+    </style>
     <color name="accent">#ffffff</color>
 </resources>

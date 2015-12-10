@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 
 import com.squareup.okhttp.Call;
 import com.squareup.okhttp.Callback;
@@ -35,38 +36,24 @@ import java.util.ArrayList;
 
 public class Notifications extends AppCompatActivity {
     private String jsonData;
+    private String email;
+    private boolean isNotifications;
     final ArrayList<NotificationItem> notifList = new ArrayList<>();
     private static final String TAG = "Notifications";
+    private RelativeLayout layout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notif);
+        layout = (RelativeLayout) findViewById(R.id.notif_layout);
+        Bundle b = getIntent().getExtras();
+        email = b.getString("email");
+        isNotifications = false;
         getNotifications();
 
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_notifications, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 
     private boolean isNetWorkAvailable() {
         ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -90,7 +77,7 @@ public class Notifications extends AppCompatActivity {
             OkHttpClient client = new OkHttpClient();
 
             RequestBody formBody = new FormEncodingBuilder()
-                    .add("email", "jrthomas@smu.edu")
+                    .add("email", email)
                     .build();
             String url = "http://54.149.40.71/appsassins/api/index.php/getNotifications";
             //url = "http://private-f462a-appsassins.apiary-mock.com/getNotifications";
@@ -118,7 +105,15 @@ public class Notifications extends AppCompatActivity {
                         jsonData = response.body().string();
                         parseNotifs();
                     } catch (JSONException e) {
-                        Log.e("parse", e.toString());
+                        isNotifications = false;
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Snackbar.make(layout, "No notifications", Snackbar.LENGTH_INDEFINITE).show();
+                                return;
+                            }
+                        });
+                        return;
                     }
 
                     runOnUiThread(new Runnable() {
@@ -186,6 +181,7 @@ public class Notifications extends AppCompatActivity {
         JSONObject json = new JSONObject(jsonData);
         //String status = json.getString("status");
         JSONArray notifs = json.getJSONArray("notifications");
+        isNotifications = true;
         for (int i = 0; i < notifs.length(); i++) {
             JSONObject item = notifs.getJSONObject(i);
             Integer type = item.getInt("type");

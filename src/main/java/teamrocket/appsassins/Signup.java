@@ -128,7 +128,7 @@ public class Signup extends ActionBarActivity {
     }
 
     private void createAccount() {
-        final ProgressDialog dialog = new ProgressDialog(Signup.this);
+        final ProgressDialog dialog = new ProgressDialog(Signup.this, R.style.RedProgressDialog);
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.setMessage("Logging In");
         dialog.setIndeterminate(true);
@@ -192,10 +192,6 @@ public class Signup extends ActionBarActivity {
 
                 }
             });
-
-
-
-
 
         }
         else {
