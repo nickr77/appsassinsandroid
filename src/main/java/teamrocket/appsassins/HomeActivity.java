@@ -7,13 +7,12 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
+import android.location.*;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -24,7 +23,6 @@ import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.akexorcist.roundcornerprogressbar.IconRoundCornerProgressBar;
 import com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar;
 import com.squareup.okhttp.Call;
 import com.squareup.okhttp.Callback;
@@ -50,7 +48,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 
-public class HomeActivity extends AppCompatActivity {
+public class HomeActivity extends AppCompatActivity{
     private SharedPreferences prefs;
     private static final int PICTURE_TAKING = 444;
     private static final String TAG = "HomeActivity";
@@ -64,6 +62,7 @@ public class HomeActivity extends AppCompatActivity {
     @Bind(R.id.targetName) TextView targetName;
     private Uri fileUri;
     private File photoFile;
+    private SimpleLocation simpleLocation;
 
 
     @Override
@@ -82,6 +81,12 @@ public class HomeActivity extends AppCompatActivity {
             finish();
         }
         else{
+            simpleLocation = new SimpleLocation(this);
+            if (!simpleLocation.hasLocationEnabled()) {
+                // ask the user to enable location access
+                SimpleLocation.openSettings(this);
+            }
+
             getGameInformation();
         }
 
@@ -130,7 +135,7 @@ public class HomeActivity extends AppCompatActivity {
             //Bitmap photo = (Bitmap) data.getExtras().get("data");
             Log.d(TAG, "INITIAL FILE SIZE: " + (photoFile.length() / 1024 / 1024));
 
-//
+            ///////////////////FILE COMPRESSION///////////////////////
             File pictureFile = new File(fileUri.getPath());
             File image;
             try {
@@ -156,6 +161,8 @@ public class HomeActivity extends AppCompatActivity {
             photoFile = image;
             Log.d(TAG, "FILE-->: " + Uri.fromFile(photoFile).getPath());
             Log.d(TAG, "Compressed FILE SIZE: " + (photoFile.length() / 1024));
+            ///////////////END FILE COMPRESSION////////////////////
+
             sendTagInfo(); // SUCK A DICK DANH
         }
 
@@ -168,10 +175,12 @@ public class HomeActivity extends AppCompatActivity {
             dialog.setMessage("Tagging Target");
             dialog.setIndeterminate(true);
             dialog.setCanceledOnTouchOutside(false);
+            final double latitude = simpleLocation.getLatitude();
+            final double longitude = simpleLocation.getLongitude();
             OkHttpClient client = new OkHttpClient();
             RequestBody tagBody = new MultipartBuilder().type(MultipartBuilder.FORM)
-                    .addFormDataPart("player", currentGame.getTargetEmail()).addFormDataPart("location[lat]", "32.842539")
-                    .addFormDataPart("location[lng]", "-96.782461")
+                    .addFormDataPart("player", currentGame.getTargetEmail()).addFormDataPart("location[lat]", String.valueOf(latitude))
+                    .addFormDataPart("location[lng]", String.valueOf(longitude))
                     .addFormDataPart("thumbnail", fileUri.toString(), RequestBody.create(MediaType.parse("image/jpg"), photoFile)).build();
             //"location", "{\"lat\": 32.842539, \"lng\": -96.782461}"
             Request request = new Request.Builder().url("http://private-f80ce-appsassins.apiary-mock.com/killTarget").post(tagBody).build();
