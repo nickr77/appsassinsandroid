@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -39,6 +41,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 import butterknife.Bind;
@@ -115,6 +119,7 @@ public class HomeActivity extends AppCompatActivity {
         //File image = new File(storageDir.getAbsolutePath() + fileName + ".jpg");
         //File image = new File(getExternalFilesDir(null), fileName + ".jpg");
         Log.d(TAG, "Path of create image " + image.getAbsolutePath());
+
         fileUri = Uri.fromFile(image);
         return image;
     }
@@ -123,11 +128,34 @@ public class HomeActivity extends AppCompatActivity {
         if(requestCode == PICTURE_TAKING){
             Log.d(TAG, "RESPONSE CODE IS: " + resultCode);
             //Bitmap photo = (Bitmap) data.getExtras().get("data");
+            Log.d(TAG, "INITIAL FILE SIZE: " + (photoFile.length() / 1024 / 1024));
+
 //
             File pictureFile = new File(fileUri.getPath());
+            File image;
+            try {
+                image = File.createTempFile("compressed", ".jpg", getExternalFilesDir(null));
+
+            } catch (IOException e) {
+                Log.d(TAG, "FAILED");
+                return;
+            }
+            Bitmap temp = BitmapFactory.decodeFile(pictureFile.getAbsolutePath());
+            try {
+                FileOutputStream filecon = new FileOutputStream(image);
+                temp.compress(Bitmap.CompressFormat.JPEG, 70, filecon);
+
+            } catch (FileNotFoundException e) {
+                Log.d(TAG, "FAILED2");
+                return;
+            }
 
             Log.d(TAG, "FILE-->: " + fileUri.getPath());
-
+            Log.d(TAG, "FILE-->: " + Uri.fromFile(photoFile).getPath());
+            Log.d(TAG, "FILEC-->: " + Uri.fromFile(image).getPath());
+            photoFile = image;
+            Log.d(TAG, "FILE-->: " + Uri.fromFile(photoFile).getPath());
+            Log.d(TAG, "Compressed FILE SIZE: " + (photoFile.length() / 1024));
             sendTagInfo(); // SUCK A DICK DANH
         }
 
