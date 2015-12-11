@@ -28,6 +28,7 @@ import com.squareup.okhttp.Call;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.FormEncodingBuilder;
 import com.squareup.okhttp.MediaType;
+import com.squareup.okhttp.MultipartBuilder;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
@@ -58,6 +59,7 @@ public class HomeActivity extends AppCompatActivity {
     @Bind(R.id.gameTitleText) TextView gameTitle;
     @Bind(R.id.targetName) TextView targetName;
     private Uri fileUri;
+    private File photoFile;
 
 
     @Override
@@ -88,7 +90,7 @@ public class HomeActivity extends AppCompatActivity {
         if(getApplicationContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)){
             Intent pictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             if(pictureIntent.resolveActivity(getPackageManager()) != null){
-                File photoFile = null;
+                photoFile = null;
                 try {
                     photoFile = createImageFile();
                 } catch (IOException e){
@@ -126,14 +128,82 @@ public class HomeActivity extends AppCompatActivity {
 
             Log.d(TAG, "FILE-->: " + fileUri.getPath());
 
-
-            //setImage(fileUri.getPath());
+            sendTagInfo(); // SUCK A DICK DANH
         }
 
     }
 
     private void sendTagInfo(){
+        if(isNetWorkAvailable()) {
+            final ProgressDialog dialog = new ProgressDialog(HomeActivity.this, R.style.RedProgressDialog);
+            dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            dialog.setMessage("Tagging Target");
+            dialog.setIndeterminate(true);
+            dialog.setCanceledOnTouchOutside(false);
+            OkHttpClient client = new OkHttpClient();
+            RequestBody tagBody = new MultipartBuilder().type(MultipartBuilder.FORM)
+                    .addFormDataPart("player", currentGame.getTargetEmail()).addFormDataPart("location[lat]", "32.842539")
+                    .addFormDataPart("location[lng]", "-96.782461")
+                    .addFormDataPart("thumbnail", fileUri.toString(), RequestBody.create(MediaType.parse("image/jpg"), photoFile)).build();
+            //"location", "{\"lat\": 32.842539, \"lng\": -96.782461}"
+            Request request = new Request.Builder().url("http://private-f80ce-appsassins.apiary-mock.com/killTarget").post(tagBody).build();
+            Call call = client.newCall(request);
+            dialog.show();
+            call.enqueue(new Callback() {
+                @Override
+                public void onFailure(Request request, IOException e) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            dialog.hide();
+                            Snackbar.make(layout, "Error tagging target", Snackbar.LENGTH_SHORT).show();
+                        }
+                    });
 
+                }
+
+                @Override
+                public void onResponse(Response response) throws IOException {
+                    if(isTagSuccessful(response.body().string())){
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                dialog.hide();
+                                Snackbar.make(layout, "Target Tagged", Snackbar.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                    else{
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                dialog.hide();
+                                Snackbar.make(layout, "Error tagging target", Snackbar.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+
+                }
+            });
+        }
+        else{
+            Snackbar.make(layout, "No Internet Connection", Snackbar.LENGTH_SHORT).show();
+        }
+    }
+
+    private boolean isTagSuccessful(String tagResponse){
+        int status = 0;
+        try {
+            status = new JSONObject(tagResponse).getInt("status");
+        } catch (JSONException e) {
+            return false;
+        }
+        if(status == 1){
+            return true;
+        }
+        else{
+            return false;
+        }
     }
 
 
@@ -304,7 +374,7 @@ public class HomeActivity extends AppCompatActivity {
         RequestBody formBody = new FormEncodingBuilder()
                 .add("email", user.getUsername()).build();
         Request request = new Request.Builder()
-                .url("http://private-f80ce-appsassins.apiary-mock.com/playerTarget").post(formBody).build();
+                .url("http://private-f80ce-appsassins.apiary-mock.com/getCurrentTarget").post(formBody).build();
 
         Response response = client.newCall(request).execute();
         if(!response.isSuccessful()){
