@@ -4,9 +4,12 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -34,6 +37,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
 
 import butterknife.Bind;
@@ -43,6 +47,7 @@ import butterknife.OnClick;
 
 public class HomeActivity extends AppCompatActivity {
     private SharedPreferences prefs;
+    private static final int PICTURE_TAKING = 444;
     private static final String TAG = "HomeActivity";
     private User user;
     private int status;
@@ -52,6 +57,7 @@ public class HomeActivity extends AppCompatActivity {
     @Bind(R.id.remainingPlayers) TextView remainingPlayers;
     @Bind(R.id.gameTitleText) TextView gameTitle;
     @Bind(R.id.targetName) TextView targetName;
+    private Uri fileUri;
 
 
     @Override
@@ -75,6 +81,61 @@ public class HomeActivity extends AppCompatActivity {
 
 
     }
+
+
+    @OnClick(R.id.tagButton)
+    public void takePicture(){
+        if(getApplicationContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)){
+            Intent pictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            if(pictureIntent.resolveActivity(getPackageManager()) != null){
+                File photoFile = null;
+                try {
+                    photoFile = createImageFile();
+                } catch (IOException e){
+                    Log.d(TAG, "COULD NOT CREATE THE FILE");
+                }
+                if (photoFile != null) {
+                    pictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
+                    startActivityForResult(pictureIntent, PICTURE_TAKING);
+                }
+            }
+        }
+    }
+
+    private File createImageFile() throws IOException{
+        String fileName = "temp";
+        File storageDir = getExternalFilesDir(null);
+        if (storageDir != null) {
+            Log.d(TAG, "CREATING Directory " + storageDir.getAbsolutePath());
+            storageDir.mkdir();
+        }
+        File image = File.createTempFile(fileName, ".jpg", storageDir);
+        //File image = new File(storageDir.getAbsolutePath() + fileName + ".jpg");
+        //File image = new File(getExternalFilesDir(null), fileName + ".jpg");
+        Log.d(TAG, "Path of create image " + image.getAbsolutePath());
+        fileUri = Uri.fromFile(image);
+        return image;
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        if(requestCode == PICTURE_TAKING){
+            Log.d(TAG, "RESPONSE CODE IS: " + resultCode);
+            //Bitmap photo = (Bitmap) data.getExtras().get("data");
+//
+            File pictureFile = new File(fileUri.getPath());
+
+            Log.d(TAG, "FILE-->: " + fileUri.getPath());
+
+
+            //setImage(fileUri.getPath());
+        }
+
+    }
+
+    private void sendTagInfo(){
+
+    }
+
 
     private void getGameInformation() {
         if (isNetWorkAvailable()) {
@@ -269,4 +330,6 @@ public class HomeActivity extends AppCompatActivity {
 //        Intent notifPage = new Intent(getApplicationContext(), Notifications.class);
 //        startActivity(notifPage);
 //    }
+
+
 }
