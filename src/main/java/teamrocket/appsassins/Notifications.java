@@ -106,6 +106,7 @@ public class Notifications extends AppCompatActivity {
                         parseNotifs();
                     } catch (JSONException e) {
                         isNotifications = false;
+                        Log.i("no notifs", e.toString());
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -199,8 +200,10 @@ public class Notifications extends AppCompatActivity {
                         " has been denied in " + item.getString("gameName"));
             }
             else if (type == 3) {
-                newNotif = new NotificationItem(item.getString("user2") +
-                        " has invited you to play in " + item.getString("gameName"));
+                //newNotif = new NotificationItem(item.getString("user2") +
+                //        " has invited you to play in " + item.getString("gameName"));
+                newNotif = new NotificationItem("You have been invited to play in " +
+                item.getString("gameName"));
             }
             else if (type == 4) {
                 newNotif = new NotificationItem("The game " + item.getString("gameName") +
@@ -219,6 +222,7 @@ public class Notifications extends AppCompatActivity {
             }
             newNotif.setType(type);
             newNotif.setNotifID(item.getInt("notifID"));
+            newNotif.setEmail(email);
             notifList.add(newNotif);
         }
     }

@@ -20,6 +20,7 @@ import java.io.IOException;
  */
 public class NotificationItem {
     private String value;
+    private String email;
     private int type;
     private int notifID;
 
@@ -45,6 +46,10 @@ public class NotificationItem {
         return value;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
     public String toString() {
         return getValue();
     }
@@ -61,6 +66,11 @@ public class NotificationItem {
         this.value = val;
     }
 
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+
     public void dismiss() {
         Integer id = notifID;
         OkHttpClient client = new OkHttpClient();
@@ -68,10 +78,10 @@ public class NotificationItem {
         RequestBody formBody = new FormEncodingBuilder()
                 .add("notifID", id.toString())
                 .add("read", "1")
-                .add("email", "spanky@smu.edu")
+                .add("email", email)
                 .build();
-        String url = "http://54.149.40.71/appsassins/api/index.php/getNotifications";
-        url = "http://private-f462a-appsassins.apiary-mock.com/read";
+        String url = "http://54.149.40.71/appsassins/api/index.php/sendReadResponse";
+        //url = "http://private-f462a-appsassins.apiary-mock.com/read";
         Request request = new Request.Builder().url(url).post(formBody).build();
 
 
