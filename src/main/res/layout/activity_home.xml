@@ -78,7 +78,7 @@
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:text="Tag Target"
-        android:id="@+id/button"
+        android:id="@+id/tagButton"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:textSize="20sp"

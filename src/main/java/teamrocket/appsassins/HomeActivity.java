@@ -4,11 +4,15 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.location.*;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -19,12 +23,12 @@ import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.akexorcist.roundcornerprogressbar.IconRoundCornerProgressBar;
 import com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar;
 import com.squareup.okhttp.Call;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.FormEncodingBuilder;
 import com.squareup.okhttp.MediaType;
+import com.squareup.okhttp.MultipartBuilder;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
@@ -34,6 +38,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 import butterknife.Bind;
@@ -41,8 +48,9 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 
-public class HomeActivity extends AppCompatActivity {
+public class HomeActivity extends AppCompatActivity{
     private SharedPreferences prefs;
+    private static final int PICTURE_TAKING = 444;
     private static final String TAG = "HomeActivity";
     private User user;
     private int status;
@@ -52,6 +60,9 @@ public class HomeActivity extends AppCompatActivity {
     @Bind(R.id.remainingPlayers) TextView remainingPlayers;
     @Bind(R.id.gameTitleText) TextView gameTitle;
     @Bind(R.id.targetName) TextView targetName;
+    private Uri fileUri;
+    private File photoFile;
+    private SimpleLocation simpleLocation;
 
 
     @Override
@@ -70,11 +81,168 @@ public class HomeActivity extends AppCompatActivity {
             finish();
         }
         else{
+            simpleLocation = new SimpleLocation(this);
+            if (!simpleLocation.hasLocationEnabled()) {
+                // ask the user to enable location access
+                SimpleLocation.openSettings(this);
+            }
+
             getGameInformation();
         }
 
 
     }
+
+
+    @OnClick(R.id.tagButton)
+    public void takePicture(){
+        if(getApplicationContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)){
+            Intent pictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            if(pictureIntent.resolveActivity(getPackageManager()) != null){
+                photoFile = null;
+                try {
+                    photoFile = createImageFile();
+                } catch (IOException e){
+                    Log.d(TAG, "COULD NOT CREATE THE FILE");
+                }
+                if (photoFile != null) {
+                    pictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
+                    startActivityForResult(pictureIntent, PICTURE_TAKING);
+                }
+            }
+        }
+    }
+
+    private File createImageFile() throws IOException{
+        String fileName = "temp";
+        File storageDir = getExternalFilesDir(null);
+        if (storageDir != null) {
+            Log.d(TAG, "CREATING Directory " + storageDir.getAbsolutePath());
+            storageDir.mkdir();
+        }
+        File image = File.createTempFile(fileName, ".jpg", storageDir);
+        //File image = new File(storageDir.getAbsolutePath() + fileName + ".jpg");
+        //File image = new File(getExternalFilesDir(null), fileName + ".jpg");
+        Log.d(TAG, "Path of create image " + image.getAbsolutePath());
+
+        fileUri = Uri.fromFile(image);
+        return image;
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        if(requestCode == PICTURE_TAKING){
+            Log.d(TAG, "RESPONSE CODE IS: " + resultCode);
+            //Bitmap photo = (Bitmap) data.getExtras().get("data");
+            Log.d(TAG, "INITIAL FILE SIZE: " + (photoFile.length() / 1024 / 1024));
+
+            ///////////////////FILE COMPRESSION///////////////////////
+            File pictureFile = new File(fileUri.getPath());
+            File image;
+            try {
+                image = File.createTempFile("compressed", ".jpg", getExternalFilesDir(null));
+
+            } catch (IOException e) {
+                Log.d(TAG, "FAILED");
+                return;
+            }
+            Bitmap temp = BitmapFactory.decodeFile(pictureFile.getAbsolutePath());
+            try {
+                FileOutputStream filecon = new FileOutputStream(image);
+                temp.compress(Bitmap.CompressFormat.JPEG, 70, filecon);
+
+            } catch (FileNotFoundException e) {
+                Log.d(TAG, "FAILED2");
+                return;
+            }
+
+            Log.d(TAG, "FILE-->: " + fileUri.getPath());
+            Log.d(TAG, "FILE-->: " + Uri.fromFile(photoFile).getPath());
+            Log.d(TAG, "FILEC-->: " + Uri.fromFile(image).getPath());
+            photoFile = image;
+            Log.d(TAG, "FILE-->: " + Uri.fromFile(photoFile).getPath());
+            Log.d(TAG, "Compressed FILE SIZE: " + (photoFile.length() / 1024));
+            ///////////////END FILE COMPRESSION////////////////////
+
+            sendTagInfo(); // SUCK A DICK DANH
+        }
+
+    }
+
+    private void sendTagInfo(){
+        if(isNetWorkAvailable()) {
+            final ProgressDialog dialog = new ProgressDialog(HomeActivity.this, R.style.RedProgressDialog);
+            dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            dialog.setMessage("Tagging Target");
+            dialog.setIndeterminate(true);
+            dialog.setCanceledOnTouchOutside(false);
+            final double latitude = simpleLocation.getLatitude();
+            final double longitude = simpleLocation.getLongitude();
+            OkHttpClient client = new OkHttpClient();
+            RequestBody tagBody = new MultipartBuilder().type(MultipartBuilder.FORM)
+                    .addFormDataPart("player", currentGame.getTargetEmail()).addFormDataPart("location[lat]", String.valueOf(latitude))
+                    .addFormDataPart("location[lng]", String.valueOf(longitude))
+                    .addFormDataPart("thumbnail", fileUri.toString(), RequestBody.create(MediaType.parse("image/jpg"), photoFile)).build();
+            //"location", "{\"lat\": 32.842539, \"lng\": -96.782461}"
+            Request request = new Request.Builder().url("http://private-f80ce-appsassins.apiary-mock.com/killTarget").post(tagBody).build();
+            Call call = client.newCall(request);
+            dialog.show();
+            call.enqueue(new Callback() {
+                @Override
+                public void onFailure(Request request, IOException e) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            dialog.hide();
+                            Snackbar.make(layout, "Error tagging target", Snackbar.LENGTH_SHORT).show();
+                        }
+                    });
+
+                }
+
+                @Override
+                public void onResponse(Response response) throws IOException {
+                    if(isTagSuccessful(response.body().string())){
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                dialog.hide();
+                                Snackbar.make(layout, "Target Tagged", Snackbar.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                    else{
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                dialog.hide();
+                                Snackbar.make(layout, "Error tagging target", Snackbar.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+
+                }
+            });
+        }
+        else{
+            Snackbar.make(layout, "No Internet Connection", Snackbar.LENGTH_SHORT).show();
+        }
+    }
+
+    private boolean isTagSuccessful(String tagResponse){
+        int status = 0;
+        try {
+            status = new JSONObject(tagResponse).getInt("status");
+        } catch (JSONException e) {
+            return false;
+        }
+        if(status == 1){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
 
     private void getGameInformation() {
         if (isNetWorkAvailable()) {
@@ -243,7 +411,7 @@ public class HomeActivity extends AppCompatActivity {
         RequestBody formBody = new FormEncodingBuilder()
                 .add("email", user.getUsername()).build();
         Request request = new Request.Builder()
-                .url("http://private-f80ce-appsassins.apiary-mock.com/playerTarget").post(formBody).build();
+                .url("http://private-f80ce-appsassins.apiary-mock.com/getCurrentTarget").post(formBody).build();
 
         Response response = client.newCall(request).execute();
         if(!response.isSuccessful()){
@@ -269,4 +437,6 @@ public class HomeActivity extends AppCompatActivity {
 //        Intent notifPage = new Intent(getApplicationContext(), Notifications.class);
 //        startActivity(notifPage);
 //    }
+
+
 }
