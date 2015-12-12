@@ -431,12 +431,5 @@ public class HomeActivity extends AppCompatActivity{
         }
 
     }
-//    @OnClick(R.id.tempbutton)
-//    public void startNotif(View view) {
-//        Log.d(TAG, "here");
-//        Intent notifPage = new Intent(getApplicationContext(), Notifications.class);
-//        startActivity(notifPage);
-//    }
-
 
 }
