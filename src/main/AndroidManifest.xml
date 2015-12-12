@@ -45,7 +45,7 @@
         </activity>
         <activity
             android:name=".Notifications"
-            android:label="@string/title_activity_notifications">
+            android:label="@string/title_activity_notifications" >
         </activity>
 
         <receiver
@@ -73,6 +73,9 @@
                 <action android:name="com.google.android.gms.iid.InstanceID" />
             </intent-filter>
         </service>
+
+        <activity android:name=".GameWaitingActivity" >
+        </activity>
     </application>
 
 </manifest>

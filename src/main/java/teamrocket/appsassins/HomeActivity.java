@@ -60,10 +60,11 @@ public class HomeActivity extends AppCompatActivity{
     @Bind(R.id.remainingPlayers) TextView remainingPlayers;
     @Bind(R.id.gameTitleText) TextView gameTitle;
     @Bind(R.id.targetName) TextView targetName;
+    @Bind(R.id.tagButton) Button tagButton;
     private Uri fileUri;
     private File photoFile;
     private SimpleLocation simpleLocation;
-    private boolean test;
+    private int test;
 
 
     @Override
@@ -271,6 +272,7 @@ public class HomeActivity extends AppCompatActivity{
                         @Override
                         public void run() {
                             dialog.hide();
+                            tagButton.setVisibility(View.INVISIBLE);
                             Snackbar.make(layout, "Could not fetch information", Snackbar.LENGTH_SHORT).show();
                         }
                     });
@@ -281,18 +283,27 @@ public class HomeActivity extends AppCompatActivity{
                     try {
                         currentGame = new CurrentGame();
                         test = parseResponse(response.body().string());
-                        if (test == true) {
+                        if (test == 2) {
                             getTarget();
                         }
 
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                if (test == false) {
+                                dialog.hide();
+                                if (test == -1) {
                                     Log.d(TAG, "SHIT IS FALSE");
-                                    dialog.hide();
+                                    Intent intent = new Intent(getApplicationContext(), GameWaitingActivity.class);
+                                    startActivity(intent);
+                                    finish();
                                     //GO TO WAITING ACTIVIITY
 
+                                } else if (test == 0 || test == 1) {
+                                    progress.setMax(1);
+                                    progress.setProgress(1);
+                                    gameTitle.setText(currentGame.getGameName());
+                                    targetName.setText("Game Hasn't Started Yet");
+                                    tagButton.setVisibility(View.INVISIBLE);
                                 } else {
                                     remainingPlayers.setText(getString(R.string.remainingplayers) + " " + (currentGame.getPlayerAmount() - currentGame.getRemainingPlayers()) + "/"
                                             + currentGame.getPlayerAmount());
@@ -300,7 +311,7 @@ public class HomeActivity extends AppCompatActivity{
                                     progress.setProgress(currentGame.getPlayerAmount() - currentGame.getRemainingPlayers());
                                     gameTitle.setText(currentGame.getGameName());
                                     targetName.setText(currentGame.getTargetName());
-                                    dialog.hide();
+                                    tagButton.setVisibility(View.VISIBLE);
                                 }
 
 
@@ -391,7 +402,7 @@ public class HomeActivity extends AppCompatActivity{
         }
         return isAvailable;
     }
-    private boolean parseResponse(String json) throws JSONException{
+    private int parseResponse(String json) throws JSONException{
         Log.d(TAG, json);
         Log.d(TAG,"HELLO0");
         JSONObject game = new JSONObject(json);
@@ -402,6 +413,9 @@ public class HomeActivity extends AppCompatActivity{
             status = -1;
         }
         Log.d(TAG,"HELLO2");
+        if (status == 1 || status == 0){
+            currentGame.setGameName(game.getString("gameName"));
+        }
         if (status == 2){
             int gm = game.getJSONObject("user").getInt("gameMaster");
             if (gm == 1){
@@ -418,10 +432,10 @@ public class HomeActivity extends AppCompatActivity{
                 int alive = playerJson.getJSONObject(i).getInt("Alive");
                 currentGame.addPlayer(name, email, alive);
             }
-            return true;
+            return status;
         }
         Log.d(TAG, "Returning False");
-        return false;
+        return status;
 
 
 

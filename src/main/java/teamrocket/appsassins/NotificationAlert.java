@@ -60,8 +60,8 @@ public class NotificationAlert extends DialogFragment {
                                 .add("notifID", whatID.toString())
                                 .add("accepted", "0")
                                 .build();
-                        String url = "http://54.149.40.71/appsassins/api/index.php/getNotifications";
-                        url = "http://private-f462a-appsassins.apiary-mock.com/confirm";
+                        String url = "http://54.149.40.71/appsassins/api/index.php/sendNotificationResponse";
+                        //url = "http://private-f462a-appsassins.apiary-mock.com/confirm";
                         Request request = new Request.Builder().url(url).post(formBody).build();
 
 
