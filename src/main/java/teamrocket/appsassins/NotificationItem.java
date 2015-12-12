@@ -70,7 +70,6 @@ public class NotificationItem {
                 .add("read", "1")
                 .build();
         String url = "http://54.149.40.71/appsassins/api/index.php/getNotifications";
-        url = "http://private-f462a-appsassins.apiary-mock.com/read";
         Request request = new Request.Builder().url(url).post(formBody).build();
 
 

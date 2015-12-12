@@ -138,7 +138,7 @@ public class LoginActivity extends ActionBarActivity {
                     .add("email", emailText).add("password", pwText)
                     .build();
 
-            Request request = new Request.Builder().url("http://private-f80ce-appsassins.apiary-mock.com/loginUser").post(formBody).build();
+            Request request = new Request.Builder().url("http://54.149.40.71/appsassins/api/index.php/loginUser").post(formBody).build();
 
 
             Call call = client.newCall(request);
@@ -200,7 +200,7 @@ public class LoginActivity extends ActionBarActivity {
     }
     private boolean verifyUser(String email, String password) throws JSONException{
         JSONObject user = new JSONObject(jsonData);
-        if( user.getInt("status") == 2){
+        if( user.getInt("status") != 1){
             Log.d(TAG, "FAILED, incorrect account info");
             return false;
         }

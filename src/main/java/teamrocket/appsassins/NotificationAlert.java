@@ -94,8 +94,7 @@ public class NotificationAlert extends DialogFragment {
                                 .add("notifID", whatID.toString())
                                 .add("accepted", "1")
                                 .build();
-                        String url = "http://54.149.40.71/appsassins/api/index.php/getNotifications";
-                        url = "http://private-f462a-appsassins.apiary-mock.com/confirm";
+                        String url = "http://54.149.40.71/appsassins/api/index.php/sendNotificationResponse";
                         Request request = new Request.Builder().url(url).post(formBody).build();
 
 
@@ -137,7 +136,7 @@ public class NotificationAlert extends DialogFragment {
             final ImageView imagev = (ImageView) dialogView.findViewById(R.id.image_kill);
             imagev.getLayoutParams().height = 500;
             imagev.getLayoutParams().width = 500;
-            String url = "http://private-f462a-appsassins.apiary-mock.com/viewKill";
+            String url = "http://54.149.40.71/appsassins/api/index.php/viewKill";
             OkHttpClient client = new OkHttpClient();
 
             RequestBody formBody = new FormEncodingBuilder()

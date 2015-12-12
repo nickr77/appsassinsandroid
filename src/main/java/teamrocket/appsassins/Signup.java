@@ -106,6 +106,7 @@ public class Signup extends ActionBarActivity {
             confirmPasswordEntry.requestFocus();
             return;
         }
+        Log.d(TAG, password + " is valid!");
 
         createAccount();
 
@@ -133,7 +134,7 @@ public class Signup extends ActionBarActivity {
         dialog.setMessage("Logging In");
         dialog.setIndeterminate(true);
         dialog.setCanceledOnTouchOutside(false);
-
+        Log.d(TAG, "BEGIN CREATE ACCOUNT");
 
 
         if (isNetWorkAvailable()){
@@ -146,7 +147,7 @@ public class Signup extends ActionBarActivity {
                     .add("email", email).add("password", password)
                     .build();
 
-            Request request = new Request.Builder().url("http://private-f80ce-appsassins.apiary-mock.com/registerUser").post(formBody).build();
+            Request request = new Request.Builder().url("http://54.149.40.71/appsassins/api/index.php/registerUser").post(formBody).build();
 
 
             Call call = client.newCall(request);
@@ -171,6 +172,7 @@ public class Signup extends ActionBarActivity {
                         isWorking = verifyAccount();
                     } catch (JSONException e) {
                         //This ain't the ritz carlton, I'm not gonna handle this
+                        Log.d(TAG, "JSON Exception 1");
 
                     }
                     runOnUiThread(new Runnable() {
@@ -185,7 +187,7 @@ public class Signup extends ActionBarActivity {
                             }
                             else {
 
-                                Snackbar.make(v, "Could not connect to the server", Snackbar.LENGTH_SHORT).show();
+                                Snackbar.make(v, "Account Exists", Snackbar.LENGTH_SHORT).show();
                             }
                         }
                     });
@@ -210,6 +212,8 @@ public class Signup extends ActionBarActivity {
     }
     private boolean verifyAccount() throws JSONException {
         JSONObject user = new JSONObject(jsonData);
+        Log.d(TAG, jsonData);
+        Log.d(TAG, user.getInt("status") + " is the status");
         if(!(user.getInt("status") == 1)){
             Log.d(TAG, "FAILED, account exists");
             return false;

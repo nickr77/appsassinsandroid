@@ -63,6 +63,7 @@ public class HomeActivity extends AppCompatActivity{
     private Uri fileUri;
     private File photoFile;
     private SimpleLocation simpleLocation;
+    private boolean test;
 
 
     @Override
@@ -183,7 +184,7 @@ public class HomeActivity extends AppCompatActivity{
                     .addFormDataPart("location[lng]", String.valueOf(longitude))
                     .addFormDataPart("thumbnail", fileUri.toString(), RequestBody.create(MediaType.parse("image/jpg"), photoFile)).build();
             //"location", "{\"lat\": 32.842539, \"lng\": -96.782461}"
-            Request request = new Request.Builder().url("http://private-f80ce-appsassins.apiary-mock.com/killTarget").post(tagBody).build();
+            Request request = new Request.Builder().url("http://54.149.40.71/appsassins/api/index.php/killTarget").post(tagBody).build();
             Call call = client.newCall(request);
             dialog.show();
             call.enqueue(new Callback() {
@@ -258,7 +259,7 @@ public class HomeActivity extends AppCompatActivity{
                     .add("email", user.getUsername())
                     .build();
 
-            Request request = new Request.Builder().url("http://private-f80ce-appsassins.apiary-mock.com/getCurrentGameStatus").post(formBody).build();
+            Request request = new Request.Builder().url("http://54.149.40.71/appsassins/api/index.php/getCurrentGameStatus").post(formBody).build();
 
             Log.d(TAG, "ABOUT TO CALL NETWORK");
             Call call = client.newCall(request);
@@ -279,18 +280,29 @@ public class HomeActivity extends AppCompatActivity{
                 public void onResponse(Response response) throws IOException {
                     try {
                         currentGame = new CurrentGame();
-                        parseResponse(response.body().string());
-                        getTarget();
+                        test = parseResponse(response.body().string());
+                        if (test == true) {
+                            getTarget();
+                        }
+
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                remainingPlayers.setText(getString(R.string.remainingplayers) + " " + (currentGame.getPlayerAmount() - currentGame.getRemainingPlayers()) + "/"
-                                        + currentGame.getPlayerAmount());
-                                progress.setMax(currentGame.getPlayerAmount());
-                                progress.setProgress(currentGame.getPlayerAmount() - currentGame.getRemainingPlayers());
-                                gameTitle.setText(currentGame.getGameName());
-                                targetName.setText(currentGame.getTargetName());
-                                dialog.hide();
+                                if (test == false) {
+                                    Log.d(TAG, "SHIT IS FALSE");
+                                    dialog.hide();
+                                    //GO TO WAITING ACTIVIITY
+
+                                } else {
+                                    remainingPlayers.setText(getString(R.string.remainingplayers) + " " + (currentGame.getPlayerAmount() - currentGame.getRemainingPlayers()) + "/"
+                                            + currentGame.getPlayerAmount());
+                                    progress.setMax(currentGame.getPlayerAmount());
+                                    progress.setProgress(currentGame.getPlayerAmount() - currentGame.getRemainingPlayers());
+                                    gameTitle.setText(currentGame.getGameName());
+                                    targetName.setText(currentGame.getTargetName());
+                                    dialog.hide();
+                                }
+
 
                             }
                         });
@@ -379,11 +391,18 @@ public class HomeActivity extends AppCompatActivity{
         }
         return isAvailable;
     }
-    private void parseResponse(String json) throws JSONException{
+    private boolean parseResponse(String json) throws JSONException{
         Log.d(TAG, json);
+        Log.d(TAG,"HELLO0");
         JSONObject game = new JSONObject(json);
-        status = game.getInt("gameStatus");
-        if (status != -1){
+        Log.d(TAG,"HELLO1");
+        try{
+            status = game.getInt("gameStatus");
+        } catch(JSONException e){
+            status = -1;
+        }
+        Log.d(TAG,"HELLO2");
+        if (status == 2){
             int gm = game.getJSONObject("user").getInt("gameMaster");
             if (gm == 1){
                 currentGame.isGameMaster = true;
@@ -399,7 +418,11 @@ public class HomeActivity extends AppCompatActivity{
                 int alive = playerJson.getJSONObject(i).getInt("Alive");
                 currentGame.addPlayer(name, email, alive);
             }
+            return true;
         }
+        Log.d(TAG, "Returning False");
+        return false;
+
 
 
 
@@ -411,7 +434,7 @@ public class HomeActivity extends AppCompatActivity{
         RequestBody formBody = new FormEncodingBuilder()
                 .add("email", user.getUsername()).build();
         Request request = new Request.Builder()
-                .url("http://private-f80ce-appsassins.apiary-mock.com/getCurrentTarget").post(formBody).build();
+                .url("http://54.149.40.71/appsassins/api/index.php/getCurrentTarget").post(formBody).build();
 
         Response response = client.newCall(request).execute();
         if(!response.isSuccessful()){

@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Android-SimpleLocation">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/libs/Android-SimpleLocation.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
