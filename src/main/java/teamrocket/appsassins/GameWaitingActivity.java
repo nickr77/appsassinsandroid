@@ -67,6 +67,7 @@ public class GameWaitingActivity extends AppCompatActivity {
                 sendResponse(notifID);
             }
         });
+        getInvites();
 
     }
     @Override
@@ -214,21 +215,24 @@ public class GameWaitingActivity extends AppCompatActivity {
     }
 
     private void populateList(String jsondata) throws JSONException {
+        Log.d(TAG, jsondata);
         invites = new ArrayList<>();
         notifIds = new ArrayList<>();
         JSONObject json = new JSONObject(jsondata);
         JSONArray notifs = json.getJSONArray("notifications");
+
         for(int i = 0; i < notifs.length(); i++){
             JSONObject item = notifs.getJSONObject(i);
             int type = item.getInt("type");
-            notifIds.add(item.getInt("notifID"));
             if(type == 3){
-                String temp = item.getString("user2");
+                String temp = item.getString("user1");
                 String temp2 = item.getString("gameName");
                 String temp3 = temp + " has invited you to play in " + temp2;
                 invites.add(temp3);
+                notifIds.add(item.getInt("notifID"));
             }
         }
+        inviteAdapter = new ArrayAdapter<>(this, R.layout.invitelistlayout, invites);
     }
 
     private boolean isNetWorkAvailable(){

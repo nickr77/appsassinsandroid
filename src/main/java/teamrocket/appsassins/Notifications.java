@@ -50,6 +50,7 @@ public class Notifications extends AppCompatActivity {
         Bundle b = getIntent().getExtras();
         email = b.getString("email");
         isNotifications = false;
+        Log.d(TAG, email);
         getNotifications();
 
     }
@@ -103,6 +104,7 @@ public class Notifications extends AppCompatActivity {
 
                     try {
                         jsonData = response.body().string();
+                        Log.d(TAG, jsonData);
                         parseNotifs();
                     } catch (JSONException e) {
                         isNotifications = false;
@@ -192,14 +194,14 @@ public class Notifications extends AppCompatActivity {
             }
             else if (type == 1) {
                 newNotif = new NotificationItem("You have been killed by " +
-                        item.getString("user2") + " in " + item.getString("gameName"));
+                        item.getString("user1") + " in " + item.getString("gameName"));
             }
             else if (type == 2) {
-                newNotif = new NotificationItem("Your kill of " + item.getString("user2") +
+                newNotif = new NotificationItem("Your kill of " + item.getString("user1") +
                         " has been denied in " + item.getString("gameName"));
             }
             else if (type == 3) {
-                newNotif = new NotificationItem(item.getString("user2") +
+                newNotif = new NotificationItem(item.getString("user1") +
                         " has invited you to play in " + item.getString("gameName"));
             }
             else if (type == 4) {
