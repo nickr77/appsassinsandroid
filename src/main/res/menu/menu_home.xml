@@ -13,7 +13,7 @@
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_settings"
-        android:title="@string/settings"
+        android:title="Quit Game"
         app:showAsAction="never" />
     <item
         android:id="@+id/logoutButton"

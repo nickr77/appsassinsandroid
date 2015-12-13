@@ -181,8 +181,9 @@ public class HomeActivity extends AppCompatActivity{
             final double longitude = simpleLocation.getLongitude();
             OkHttpClient client = new OkHttpClient();
             RequestBody tagBody = new MultipartBuilder().type(MultipartBuilder.FORM)
-                    .addFormDataPart("player", currentGame.getTargetEmail()).addFormDataPart("location[lat]", String.valueOf(latitude))
+                    .addFormDataPart("email", currentGame.getTargetEmail()).addFormDataPart("location[lat]", String.valueOf(latitude))
                     .addFormDataPart("location[lng]", String.valueOf(longitude))
+                    .addFormDataPart("gameName", currentGame.getGameName())
                     .addFormDataPart("thumbnail", fileUri.toString(), RequestBody.create(MediaType.parse("image/jpg"), photoFile)).build();
             //"location", "{\"lat\": 32.842539, \"lng\": -96.782461}"
             Request request = new Request.Builder().url("http://54.149.40.71/appsassins/api/index.php/killTarget").post(tagBody).build();
@@ -233,7 +234,10 @@ public class HomeActivity extends AppCompatActivity{
     private boolean isTagSuccessful(String tagResponse){
         int status = 0;
         try {
+            Log.d(TAG, "GOT HERE");
+            Log.d(TAG, tagResponse);
             status = new JSONObject(tagResponse).getInt("status");
+            Log.d(TAG, status + "");
         } catch (JSONException e) {
             return false;
         }
@@ -335,6 +339,46 @@ public class HomeActivity extends AppCompatActivity{
 
     }
 
+    private void quitGame(){
+        if(isNetWorkAvailable()){
+            final ProgressDialog dialog = new ProgressDialog(HomeActivity.this, R.style.RedProgressDialog);
+            dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            dialog.setMessage("Leaving Game");
+            dialog.setIndeterminate(true);
+            dialog.setCanceledOnTouchOutside(false);
+            OkHttpClient client = new OkHttpClient();
+            RequestBody formBody = new FormEncodingBuilder()
+                    .add("email", user.getUsername()).build();
+            Request request = new Request.Builder()
+                    .url("http://54.149.40.71/appsassins/api/index.php/quitGame").post(formBody).build();
+            Call call = client.newCall(request);
+            dialog.show();
+            call.enqueue(new Callback() {
+                @Override
+                public void onFailure(Request request, IOException e) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.d(TAG, "Quit game failed");
+                            dialog.hide();
+                        }
+                    });
+                }
+
+                @Override
+                public void onResponse(Response response) throws IOException {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            dialog.hide();
+                            getGameInformation();
+                        }
+                    });
+                }
+            });
+        }
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -355,7 +399,7 @@ public class HomeActivity extends AppCompatActivity{
 
 
             case R.id.action_settings:
-                // User chose the "Settings" item, show the app settings UI...
+                quitGame();
                 return true;
 
             case R.id.action_bar_notification:

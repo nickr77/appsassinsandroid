@@ -68,8 +68,9 @@ public class NotificationItem {
         RequestBody formBody = new FormEncodingBuilder()
                 .add("notifID", id.toString())
                 .add("read", "1")
+                .add("email", "REPLACETHIS")
                 .build();
-        String url = "http://54.149.40.71/appsassins/api/index.php/getNotifications";
+        String url = "http://54.149.40.71/appsassins/api/index.php/sendReadResponse";
         Request request = new Request.Builder().url(url).post(formBody).build();
 
 
