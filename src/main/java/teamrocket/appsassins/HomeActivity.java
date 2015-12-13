@@ -74,7 +74,7 @@ public class HomeActivity extends AppCompatActivity{
         setContentView(R.layout.activity_home);
         ButterKnife.bind(this);
         user = new User();
-
+        user.setAlive(0);
 
 
         if (checkIfLoggedIn() == false){
@@ -475,6 +475,9 @@ public class HomeActivity extends AppCompatActivity{
                 String email = playerJson.getJSONObject(i).getString("email");
                 int alive = playerJson.getJSONObject(i).getInt("Alive");
                 currentGame.addPlayer(name, email, alive);
+                if(name.equals(user.getUsername())){
+                    user.setAlive(alive);
+                }
             }
             return status;
         }

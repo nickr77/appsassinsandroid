@@ -73,4 +73,6 @@ public class CurrentGame {
     public void setTargetName(String targetName) {
         this.targetName = targetName;
     }
+
+
 }
