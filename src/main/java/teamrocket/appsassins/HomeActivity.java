@@ -505,7 +505,7 @@ public class HomeActivity extends AppCompatActivity{
             String tName = result.getString("email"); //key may change
             currentGame.setTargetEmail(result.getString("email"));
             currentGame.setTargetName(result.getString("target"));
-            Log.d(TAG, currentGame.getTargetEmail());
+            Log.d(TAG, user.getUsername());
             return true;
         } catch (JSONException e) {
             e.printStackTrace();
