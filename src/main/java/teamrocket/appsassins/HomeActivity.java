@@ -155,6 +155,8 @@ public class HomeActivity extends AppCompatActivity{
             } catch (FileNotFoundException e) {
                 Log.d(TAG, "FAILED2");
                 return;
+            } catch (NullPointerException e){
+                sendTagInfo();
             }
 
             Log.d(TAG, "FILE-->: " + fileUri.getPath());
@@ -181,7 +183,7 @@ public class HomeActivity extends AppCompatActivity{
             final double longitude = simpleLocation.getLongitude();
             OkHttpClient client = new OkHttpClient();
             RequestBody tagBody = new MultipartBuilder().type(MultipartBuilder.FORM)
-                    .addFormDataPart("email", currentGame.getTargetEmail()).addFormDataPart("location[lat]", String.valueOf(latitude))
+                    .addFormDataPart("email", user.getUsername()).addFormDataPart("location[lat]", String.valueOf(latitude))
                     .addFormDataPart("location[lng]", String.valueOf(longitude))
                     .addFormDataPart("gameName", currentGame.getGameName())
                     .addFormDataPart("thumbnail", fileUri.toString(), RequestBody.create(MediaType.parse("image/jpg"), photoFile)).build();
